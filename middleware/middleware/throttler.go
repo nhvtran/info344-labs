@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -28,6 +29,16 @@ func (t *Throttler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//Use the redis database to track the number of requests
 	//made within the duration. Hint: use the Incr() command:
 	//https://godoc.org/github.com/go-redis/redis#Client.Incr
+	client := redis.NewClient(&redis.Options{
+		Addr:     "192.168.99.100:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	requests, err := client.Incr("requests").Result()
+	if err != nil {
+		fmt.Printf("error when counting requests: %v", err)
+	}
 
 	//Use r.RemoteAddr to identify the client, though beware
 	//that this will return the IP:port of the machine that
